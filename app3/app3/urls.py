@@ -1,4 +1,4 @@
-"""mysite URL Configuration
+"""app3 URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -13,23 +13,25 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import include, url
+from django.conf.urls import url, include
 from django.contrib import admin
-from django.conf.urls.static import static
-from django.conf import settings
+from kilogram import views as kilogram_views
+from django.contrib.auth import views as auth_views
 
-from mysite.views import UserCreateView, UserCreateDoneTV  #add register
 
-from blog import views as blog_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', kilogram_views.IndexView.as_view(), name = "root"),
+    url(r'^kilogram/', include('kilogram.urls')),
 
-    url(r'^accounts/', include('django.contrib.auth.urls')),
-    url(r'^accounts/register/$', UserCreateView.as_view(), name='register'),
-    url(r'^accounts/register/done/$', UserCreateDoneTV.as_view(), name='register_done'),
+     url(r'^accounts/', include('django.contrib.auth.urls')),
 
-    url(r'', include('blog.urls')),
+     url(r'^logout/$', auth_views.logout, {'next_page' : '/'}),
+     url(r'^login/$', auth_views.login,  {'template_name':'memo_app/login.html'}),
+
+     url(r'^accounts/signup$', kilogram_views.CreateUserView.as_view(), name = 'signup'),
+  url(r'^accounts/login/done$', kilogram_views.RegisteredView.as_view(), name = 'create_user_done'),
 
 
 
-] + static(settings.MEDIA_URL, document_root =settings.MEDIA_ROOT)
+]
